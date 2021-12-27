@@ -30,17 +30,11 @@ Deployment-with-Dash
 │
 │   
 │  
-│__ __ deployment              : pip environment
+│__ __ pip                     : pip environment
 │
-│__ __ static                  : static image file
+│__ __ new_data                : .csv file
 |
-|__ __ templates               : templates for Flask
 |
-|__ __ Dockerfile              
-|
-│__ __ Procfile                : for Heroku
-│
-│ 
 │__ README.md                  : explains the project
 │
 |
