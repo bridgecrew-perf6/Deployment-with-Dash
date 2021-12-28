@@ -1,62 +1,55 @@
-import dash
 from dash import dcc
 from dash import html
+import dash_bootstrap_components as dbc
 import plotly.express as px
+import dash
 import pandas as pd
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
+import plotly.graph_objs as go
 
-app = dash.Dash(__name__)
 
-# additional color dictionary
-colors = {
-    'background': '#111111',
-    'text': '#7FDBFF'}
+def drawFigure():
+    return  html.Div([
+        dbc.Card(
+            dbc.CardBody([
+                dcc.Graph(
+                    figure=px.bar(
+                        df, x="sepal_width", y="sepal_length", color="species"
+                    ).update_layout(
+                        template='plotly_dark',
+                        plot_bgcolor= 'rgba(0, 0, 0, 0)',
+                        paper_bgcolor= 'rgba(0, 0, 0, 0)',
+                    ),
+                    config={
+                        'displayModeBar': False
+                    }
+                )
+            ])
+        ),
+    ])
 
-#Read csv file
-game = pd.read_csv('new_data')
+# Text field
+def drawText(text):
+    return html.Div([
+        dbc.Card(
+            dbc.CardBody([
+                html.Div([
+                    html.P(text),
+                ], style={'text-align': 'center'})
+            ])
+        ),
+    ])
 
-gamenew = game[['name', 'required_age','developers', 'publishers', 'total_positive',
-                'total_negative', 'total_reviews', 'currency', 'final_formatted',
-                'genre', 'year']]
-
-gamenew.rename(columns={'name': 'Game Name',
-                        'required_age': 'Required Age',
-                        'developers': 'Game Developers',
-                        'publishers': 'Game Publishers',
-                        'total_positive': 'Positive Reviews',
-                        'total_negative': 'Negative Reviews',
-                        'currency': 'Currency',
-                        'final_formatted': 'Price',
-                        'genre': 'Genres',
-                        'year': 'Released Year'})
-
-############## OS SYSTEM ##################
-fig = make_subplots(rows=1, cols=3, subplot_titles=('linux', 'mac', 'windows'))
-length = len(game)
-
-cnames = ['linux', 'mac', 'windows']
-for k, name in enumerate(cnames):
-    columns = game[name].sum()
-    fig.add_trace(go.Bar(x=['True', 'False'], y=[columns, length-columns], name=name), 1,k+1)
-
-fig.update_layout(title_text='Most Used OS Systems', title_x=0.5,barmode='relative',  bargap=0.05, width=700, height=400)
-
-############# MOST SEEN GENRES #########
-genres = game.genre.value_counts()
-most_seen_genres = genres[genres.values > 90]
-
-# draw a pie chart for genres
-figGenres = px.pie(game, values=most_seen_genres, names= most_seen_genres.keys(), title='Most Seen Genres')
-fig.show()
-fig.show()
-
-######## MOST SEEN DEVELOPERS ###########
-most_seen_developers = game.developers.value_counts().head(10)
-figDev = px.pie(game, values=most_seen_developers, names= most_seen_developers.keys(), title='Most Seen Developers')
-fig.show()
-
-def generate_table(dataframe, max_rows=10):
+def drawTextHead(text):
+    return html.Div([
+        dbc.Card(
+            dbc.CardBody([
+                html.Div([
+                    html.H6(text),
+                ], style={'textAlign': 'center'})
+            ])
+        ),
+    ])
+def generate_table(dataframe, max_rows=15):
     return html.Table([
         html.Thead(
             html.Tr([html.Th(col) for col in dataframe.columns])
@@ -68,28 +61,251 @@ def generate_table(dataframe, max_rows=10):
         ])
     ])
 
+# Data
+game = pd.read_csv('new_data')
+L = len(game)
+game_count = game['Name'].value_counts()
 
-app.layout = html.Div(children=[
-    html.H1(children='Steam Game Deployment'),
+#most seen 15 genres
+genres = game['Genres'].value_counts().head(15)
+genres.keys()
 
-    html.Div(children='''
-        Game data
-    '''),
 
-    dcc.Graph(
-        id='example-graph',
-        figure=fig
-    ),
-    dcc.Graph(
-        id='Genres',
-        figure=figGenres
-    ), dcc.Graph(
-        id='Developers',
-        figure=figDev
-    ),
-    html.H4(children='Steam Games Data'),
-    generate_table(gamenew)
+display_cols = ['Name', 'Developers', 'Year', 'Genres','Revenue']
+top_15 = game.sort_values(by='Revenue', ascending=False).head(15)
+
+top = top_15[display_cols]
+
+
+# Build App
+app = dash.Dash(external_stylesheets=[dbc.themes.CYBORG])
+
+app.layout = html.Div([
+    html.Div(children=[
+    html.H1('FULL - STEAM',style={'text-align': 'center'}),
+    html.H2('More Games',style={'text-align': 'center'}),
+        dbc.Card(
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col([
+                        drawText('STEAM BY MORE NUMBERS AND GRAPHS')
+                    ], width=12)])])),
+
+    html.P('''Steam is a video game digital distribution service by Valve.
+              It was launched as a standalone software client in September 2003.
+              Valve to provide automatic updates for client games.'''),
+
+
+        dbc.Card(
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col([
+                        drawText('STEAM HAD APPROXIMATELY 120 MILLION MONTHLY ACTIVE PLAYERS IN 2020')
+                    ], width=4),
+                    dbc.Col([
+                        drawText('MORE ACTION, ADVENTURE GAMES IN 2020')
+                    ], width=4),
+                    dbc.Col([
+                        drawText('STEAM HAD APPROXIMATELY 120 MILLION MONTHLY ACTIVE PLAYERS IN 2020.')
+                    ], width=4)
+                ])])),
+
+    dbc.Card(
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    drawTextHead('AGE - FEE RELATION')
+                ], width=3),
+                dbc.Col([
+                    drawTextHead('ANNUAL RELEASED GAME')
+                ], width=3),
+                dbc.Col([
+                    drawTextHead('MOST SEEN GENRES')
+                ], width=6),
+            ], align='center'),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        dbc.Card(
+                            dbc.CardBody([
+                                dcc.Graph(
+                                    figure=px.bar(
+                                        game, x="Is Free", y="Required Age", color="Required Age"
+
+                                    ).update_layout(
+                                        template='plotly_dark',
+                                        plot_bgcolor='rgba(0, 0, 0, 0)',
+                                        paper_bgcolor='rgba(0, 0, 0, 0)',
+                                    ),
+                                    config={
+                                        'displayModeBar': False
+                                    }
+                                )
+                            ])
+                        ),
+                    ])
+                ], width=3),
+                dbc.Col([
+                    html.Div([
+                        dbc.Card(
+                            dbc.CardBody([
+
+                                dcc.Graph(
+                                    figure=px.bar(
+                                        game, x="Year", y=game_count
+                                    ).update_layout(
+                                        template='plotly_dark',
+                                        plot_bgcolor='rgba(0, 0, 0, 0)',
+                                        paper_bgcolor='rgba(0, 0, 0, 0)',
+                                    ),
+                                    config={
+                                        'displayModeBar': False
+                                    }
+                                )
+                            ])
+                        ),
+                    ])
+                ], width=3),
+                dbc.Col([
+                    html.Div([
+                        dbc.Card(
+                            dbc.CardBody([
+                                dcc.Graph(
+                                    figure=px.pie(
+                                        game, values=genres, names=genres.keys()
+                                    ).update_layout(
+                                        template='plotly_dark',
+                                        plot_bgcolor='rgba(0, 0, 0, 0)',
+                                        paper_bgcolor='rgba(0, 0, 0, 0)',
+                                    ),
+                                    config={
+                                        'displayModeBar': False
+                                    }
+                                )
+                            ])
+                        ),
+                    ])
+                ], width=6),
+            ], align='center'),
+
+            html.Br(),
+        dbc.Row([
+            dbc.Col([
+                drawTextHead('YEAR - DEVELOPERS TOP 15 DISTRIBUTION')
+                ], width=6),
+            dbc.Col([
+                drawTextHead('YEAR - MONTH REVENUE DISTRIBUTION')
+                ], width=6),
+        ], align='center'),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        dbc.Card(
+                            dbc.CardBody([
+                                dcc.Graph(
+                                    figure=go.Figure(
+                                        data=[go.Heatmap(
+                                            x=top['Developers'],
+                                            y=top['Year'],
+                                            z=top['Revenue'], colorscale='geyser')]
+                                    ).update_layout(
+                                        xaxis_title="Developers",
+                                        yaxis_title="Year",
+                                        legend_title="Revenue",
+                                        template='plotly_dark',
+                                        plot_bgcolor='rgba(0, 0, 0, 0)',
+                                        paper_bgcolor='rgba(0, 0, 0, 0)',
+                                    ),
+                                )
+                            ])
+                        ),
+                    ])
+                ], width=6),
+                dbc.Col([
+                    html.Div([
+                        dbc.Card(
+                            dbc.CardBody([
+                                dcc.Graph(
+                                    figure = go.Figure(
+                                        data = [go.Heatmap(
+                                            x= game['Year'],
+                                            y= game['Month'],
+                                            z =game['Revenue'],colorscale='geyser')]
+                                    ).update_layout(
+                                        xaxis_title="Year",
+                                        yaxis_title="Month",
+                                        legend_title="Revenue",
+                                        template='plotly_dark',
+                                        plot_bgcolor='rgba(0, 0, 0, 0)',
+                                        paper_bgcolor='rgba(0, 0, 0, 0)',
+                                    ),
+                                )
+                            ])
+                        ),
+                    ])
+                ], width=6),
+            ], align='center'),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                  drawTextHead('YEAR - GENRES TOP 15 DISTRIBUTION')
+                ], width=12),
+            ], align='center'),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        dbc.Card(
+                            dbc.CardBody([
+                                dcc.Graph(
+                                    figure=px.scatter(
+                                        top,
+                                        x="Year",
+                                        y="Genres",
+                                        size="Revenue",
+                                        color="Revenue",
+                                        log_x=True,
+                                        size_max=60
+
+                                    ).update_layout(
+                                        template='plotly_dark',
+                                        plot_bgcolor='rgba(0, 0, 0, 0)',
+                                        paper_bgcolor='rgba(0, 0, 0, 0)',
+                                    ),
+                                    config={
+                                        'displayModeBar': False
+                                    }
+                                )
+                            ])
+                        ),
+                    ])
+                ], width=12),
+            ], align='center'),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    drawTextHead('TOP 15')
+                ], width=12),
+            ], align='center'),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        dbc.Card(
+                            dbc.CardBody([
+                                generate_table(top, 15)
+                            ])
+                        ),
+                    ])
+                ], width=12),
+            ], align='center'),
+        ]), color = 'dark'
+    )
+])
 ])
 
+# Run app and display result inline in the notebook
 if __name__ == '__main__':
     app.run_server(debug=True)
