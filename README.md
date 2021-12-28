@@ -1,4 +1,4 @@
-# Deployment with Flask 🎮
+# Deployment with Dash 🎮
 
 ![Steam-games](https://user-images.githubusercontent.com/46165841/147483259-88fd2430-1809-4fa3-a0d8-6d6a9d2531bd.jpeg)
 
