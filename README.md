@@ -53,9 +53,10 @@ Deployment-with-Dash
 
 Same visualisations:
 
-![newplot (1)](https://user-images.githubusercontent.com/46165841/147486469-4b8ce8a4-6011-4598-a5be-d1e2aebbf1bf.png)
+<img width="1439" alt="Screenshot 2022-01-10 at 09 45 07" src="https://user-images.githubusercontent.com/46165841/148738742-aece2e5b-425f-4194-9a9e-445816c92dc5.png">
 
-![newplot (2)](https://user-images.githubusercontent.com/46165841/147486500-7b51b3ac-bece-4df4-9168-94e00f277ca2.png)
+<img width="1440" alt="Screenshot 2022-01-10 at 09 46 05" src="https://user-images.githubusercontent.com/46165841/148738810-9d3f459f-96c5-482a-a767-bd835ea0256c.png">
+
 ## Timeline
 
 - Type of challenge: Learning
